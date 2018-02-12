@@ -11,24 +11,101 @@
 
 </head>
 <body>
-                        <input type="text" id="pac-input" class="controls" type="text" placeholder="Search Box">
-                        <div id="googleMap" style="width:100%;height:100%;"></div>
+    <div class="row">
+            <nav>
+                    <div class="nav-wrapper">
+                      <a href="#" class="brand-logo">Logo</a>
+                      <ul id="nav-mobile" class="right hide-on-med-and-down">
+                        <li><a href="sass.html">Sass</a></li>
+                        <li><a href="badges.html">Components</a></li>
+                        <li><a href="collapsible.html">JavaScript</a></li>
+                      </ul>
+                    </div>
+                  </nav>
+    </div>
+    <div class="container">
+        <input type="text" id="pac-input" class="controls" type="text" placeholder="Search">
+    </div>
+    <div id="googleMap" style="width:100%;height:100%;"></div>
 
 
  <!--Import jQuery before materialize.js-->
- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQJ_sXBz0eIPT4l3pN7QsC_XYKG42JMcU"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+ <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
- <script>
-        function myMap() {
-        var mapProp= {
-            center:new google.maps.LatLng(51.508742,-0.120850),
-            zoom:5,
-        };
-        var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+ <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQJ_sXBz0eIPT4l3pN7QsC_XYKG42JMcU"></script> -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<script>
+    
+    $(document).ready(function(){
+function myMap() {
+var mapProp= {
+    center:new google.maps.LatLng(51.508742,-0.120850),
+    zoom:5,
+};
+var map=new google.maps.Map($("#googleMap")[0],mapProp);
+// Create the search box and link it to the UI element.
+var input = document.getElementById('pac-input');
+var searchBox = new google.maps.places.SearchBox(input);
+map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+// Bias the SearchBox results towards current map's viewport.
+map.addListener('bounds_changed', function() {
+    searchBox.setBounds(map.getBounds());
+});
+
+var markers = [];
+// Listen for the event fired when the user selects a prediction and retrieve
+// more details for that place.
+searchBox.addListener('places_changed', function() {
+    var places = searchBox.getPlaces();
+    
+    if (places.length == 0) {
+        return;
+    }
+    
+    // Clear out the old markers.
+    markers.forEach(function(marker) {
+        marker.setMap(null);
+    });
+    markers = [];
+    
+    // For each place, get the icon, name and location.
+    var bounds = new google.maps.LatLngBounds();
+    places.forEach(function(place) {
+        if (!place.geometry) {
+            console.log("Returned place contains no geometry");
+            return;
         }
-        myMap();
-        </script>
- 
+        var icon = {
+            url: place.icon,
+            size: new google.maps.Size(71, 71),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(25, 25)
+        };
+        
+        // Create a marker for each place.
+        markers.push(new google.maps.Marker({
+            map: map,
+            icon: icon,
+            title: place.name,
+            position: place.geometry.location
+        }));
+        
+        if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+        } else {
+            bounds.extend(place.geometry.location);
+        }
+    });
+    map.fitBounds(bounds);
+});
+}
+myMap();
+});
+
+</script>
+
 </body>
 </html>
