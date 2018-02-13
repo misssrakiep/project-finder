@@ -22,4 +22,12 @@ html, body, #map {
   .navbar {
     z-index: 1000;
     }
-
+  .tooltipped {
+      z-index: 1000;
+      display: none;
+      position:absolute;
+      width: 300px;
+      height: 200px;
+      background-color: #ccc;
+      margin: 15px;
+  }
